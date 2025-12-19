@@ -11,8 +11,6 @@
 #define DISPLAY_HEIGHT 32
 #define NUM_KEYS 16
 
-
-
 const unsigned int FONTSET_SIZE = 80;
 uint8_t fontset[FONTSET_SIZE] = {
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -42,6 +40,7 @@ public:
     uint16_t PC; // program counter
     uint16_t I; // index register
     uint16_t stack[STACK_SIZE];
+	uint8_t stackPointer;
     uint8_t delayTimer;
     uint8_t soundTimer;
     uint8_t varRegisters[NUM_OF_V_REGISTERS]; // V0 through VF
