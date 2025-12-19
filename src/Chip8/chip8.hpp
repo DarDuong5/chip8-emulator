@@ -1,48 +1,19 @@
-#ifndef chip8
-#define chip8
+#ifndef CHIP8_HPP
+#define CHIP8_HPP
 
 #include <iostream>
 #include <cstdint>
-#include <fstream>
-#include <chrono>
-#include <random>
 
 #define NUM_OF_V_REGISTERS 16
 #define MEMORY_SIZE 4096
-#define NUM_OF_STACK_LEVELS 16
-#define NUM_OF_KEYS 16
-#define MONOCHROME_DISPLAY_SIZE 64*32
+#define STACK_SIZE 16
+#define DISPLAY_WIDTH 64
+#define DISPLAY_HEIGHT 32
+#define NUM_KEYS 16
+
+
 
 const unsigned int FONTSET_SIZE = 80;
-
-class Chip8 {
-    Chip8() : randGen(std::chrono::system_clock::now().time_since_epoch().count()) {
-        randByte = std::uniform_int_distribution<uint8_t>(0, 255U);
-    }
-    
-public:
-    // V0 to VF
-    uint8_t registers[NUM_OF_V_REGISTERS]{};
-    // in bytes
-    uint8_t memory[MEMORY_SIZE]{};
-    // program counter
-    uint16_t pc{};
-    uint16_t index{};
-    uint8_t stackPtr{};
-    uint16_t stack[NUM_OF_STACK_LEVELS]{};
-    uint8_t delayTimer{};
-    uint8_t soundTimer{};
-    // 0 to F
-    uint16_t keyPad[NUM_OF_KEYS]{};
-    uint32_t video[MONOCHROME_DISPLAY_SIZE]{};
-    uint16_t opcode;
-
-    std::default_random_engine randGen;
-    std::uniform_int_distribution<uint8_t> randByte;
-
-    void loadROM(char const* filename);
-};
-
 uint8_t fontset[FONTSET_SIZE] = {
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
 	0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -60,6 +31,23 @@ uint8_t fontset[FONTSET_SIZE] = {
 	0xE0, 0x90, 0x90, 0x90, 0xE0, // D
 	0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
 	0xF0, 0x80, 0xF0, 0x80, 0x80  // F
+};
+
+
+
+class Chip8 {
+public:
+    uint8_t memory[MEMORY_SIZE];
+    uint32_t display[DISPLAY_WIDTH][DISPLAY_HEIGHT];
+    uint16_t PC; // program counter
+    uint16_t I; // index register
+    uint16_t stack[STACK_SIZE];
+    uint8_t delayTimer;
+    uint8_t soundTimer;
+    uint8_t varRegisters[NUM_OF_V_REGISTERS]; // V0 through VF
+    uint8_t keyPad[NUM_KEYS];
+    uint16_t opcode;
+
 };
 
 #endif
