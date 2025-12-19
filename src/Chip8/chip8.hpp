@@ -31,8 +31,6 @@ uint8_t fontset[FONTSET_SIZE] = {
 	0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-
-
 class Chip8 {
 public:
     uint8_t memory[MEMORY_SIZE];
