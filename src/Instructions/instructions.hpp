@@ -27,6 +27,17 @@ void opcode_ANNN(Chip8* chip8);
 void opcode_BNNN(Chip8* chip8);
 void opcode_CXKK(Chip8* chip8);
 void opcode_DXYN(Chip8* chip8);
+void opcode_EX9E(Chip8* chip8);
+void opcode_EXA1(Chip8* chip8);
+void opcode_FX07(Chip8* chip8);
+void opcode_FX0A(Chip8* chip8);
+void opcode_FX15(Chip8* chip8);
+void opcode_FX18(Chip8* chip8);
+void opcode_FX1E(Chip8* chip8);
+void opcode_FX29(Chip8* chip8);
+void opcode_FX33(Chip8* chip8);
+void opcode_FX55(Chip8* chip8);
+void opcode_FX65(Chip8* chip8);
 
 
 #endif

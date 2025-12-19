@@ -11,6 +11,7 @@
 #define DISPLAY_HEIGHT 32
 #define NUM_KEYS 16
 
+const uint8_t FONTSET_START_ADDRESS = 0x050;
 const unsigned int FONTSET_SIZE = 80;
 uint8_t fontset[FONTSET_SIZE] = {
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0

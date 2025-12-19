@@ -137,12 +137,14 @@ void opcode_8XY3(Chip8* chip8) {
 void opcode_8XY4(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;
     uint8_t y = (chip8->opcode & 0x00F0) >> 4;
+
     uint16_t sum = chip8->varRegisters[x] + chip8->varRegisters[y];
     if (sum > 255) {
         chip8->varRegisters[0xF] = 1;
     } else {
         chip8->varRegisters[0xF] = 0;
     }
+
     chip8->varRegisters[x] = sum & 0x00FF;
     chip8->PC += 2;
 }
@@ -152,11 +154,13 @@ void opcode_8XY4(Chip8* chip8) {
 void opcode_8XY5(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;
     uint8_t y = (chip8->opcode & 0x00F0) >> 4;
+
     if (chip8->varRegisters[x] > chip8->varRegisters[y]) {
         chip8->varRegisters[0xF] = 1;
     } else {
         chip8->varRegisters[0xF] = 0;
     }
+
     chip8->varRegisters[x] -= chip8->varRegisters[y];
     chip8->PC += 2;
 }
@@ -175,11 +179,13 @@ void opcode_8XY6(Chip8* chip8) {
 void opcode_8XY7(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;
     uint8_t y = (chip8->opcode & 0x00F0) >> 4;
+
     if (chip8->varRegisters[y] > chip8->varRegisters[x]) {
         chip8->varRegisters[0xF] = 1;
     } else {
         chip8->varRegisters[0xF] = 0;
     }
+
     chip8->varRegisters[x] = chip8->varRegisters[y] - chip8->varRegisters[x];
     chip8->PC += 2;
 }
@@ -198,6 +204,7 @@ void opcode_8XYE(Chip8* chip8) {
 void opcode_9XY0(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;
     uint8_t y = (chip8->opcode & 0x00F0) >> 4;
+
     if (chip8->varRegisters[x] != chip8->varRegisters[y]) {
         chip8->PC += 4;
     } else {
@@ -259,4 +266,119 @@ void opcode_DXYN(Chip8* chip8) {
 
     }
     chip8->PC += 2
+}
+
+// EX9E: SKP Vx
+// Skip next instruction if key with the value of Vx is pressed.
+void opcode_EX9E(Chip8* chip8) {
+    uint8_t x = (chip8->opcode & 0x0F00) >> 8;
+    uint8_t key = chip8->varRegisters[x];
+
+    if (chip8->keyPad[key]) {
+        chip8->PC += 4;
+    } else {
+        chip8->PC += 2;
+    }
+}
+
+// EXA1: SKNP Vx
+// Skip next instruction if key with the value of Vx is not pressed.
+void opcode_EXA1(Chip8* chip8) {
+    uint8_t x = (chip8->opcode & 0x0F00) >> 8;
+    uint8_t key = chip8->varRegisters[x];
+
+    if (!chip->keyPad[key]) {
+        chip8->PC += 4;
+    } else {
+        chip8->PC += 2;
+    }
+}
+
+// FX07: LD Vx, DT
+// Set Vx = delay timer value.
+void opcode_FX07(Chip8* chip8) {
+    uint8_t x = (chip8->opcode & 0x0F00) >> 8;
+    chip8->varRegisters[x] = chip8->delayTimer;
+    chip8->PC += 2;
+}
+
+// FX0A: LD Vx, K
+// Wait for a key press, store the value of the key in Vx.
+void opcode_FX0A(Chip8* chip8) {
+    uint8_t x = (chip8->opcode & 0x0F00) >> 8;    
+    int i = 0;
+    bool keyPressed = false;
+
+    while (i < NUM_KEYS) {
+        if (chip8->keyPad[i]) {
+            chip8->varRegisters = i;
+            keyPressed = true;
+            break;
+        } else {
+            i++;
+        }
+    }
+
+    if (!keyPressed) {
+        chip8->PC -= 2;
+    }
+}
+
+// FX15: LD DT, Vx
+// Set delay timer = Vx.
+void opcode_FX15(Chip8* chip8) {
+    uint8_t x = (chip8->opcode & 0x0F00) >> 8;
+    chip8->delayTimer = chip8->varRegisters[x];
+    chip8->PC += 2;
+}
+
+// FX18: LD DT, Vx
+// Set sound timer = Vx.
+void opcode_FX18(Chip8* chip8) {
+    uint8_t x = (chip8->opcode & 0x0F00) >> 8;
+    chip8->soundTimer = chip8->varRegisters[x];
+    chip8->PC += 2;
+}
+
+// FX1E: Add I, Vx
+// Set I = I + Vx
+void opcode_FX1E(Chip8* chip8) {
+    uint8_t x = (chip8->opcode & 0x0F00) >> 8;
+    chip8->I += chip8->varRegisters[x];
+    chip8->PC += 2;
+}
+
+// FX29: LD F, Vx
+// Set I = location of sprite for digit Vx.
+void opcode_FX29(Chip8* chip8) {
+    uint8_t x = (chip8->opcode & 0x0F00) >> 8;
+    chip8->I = FONTSET_START_ADDRESS + (5 * chip8->varRegisters[x]);
+    chip8->PC += 2;
+}
+
+// FX33: LD B, Vx
+// Store BCD representation of Vx in memory location I, I+1, and I+2.
+// The interpreter takes the decimal value of Vx, and places the hundreds digit in memory at location in I,
+// the tens digit at location I+1, and the ones digit at location I+2.
+void opcode_FX33(Chip8* chip8) {
+    uint8_t x = (chip8->opcode & 0x0F00) >> 8;
+    chip8->memory[chip8->I] = (chip8->varRegisters[x] / 100) % 10;
+    chip8->memory[chip8->I + 1] = (chip8->varRegisters[x] / 10) % 10;
+    chip8->memory[chip8->I + 2] = chip8->varRegisters[x] % 10;
+    chip8->PC += 2;
+}
+
+// TODO:
+// FX55: LD [I], Vx
+// Store registers V0 through Vx in memory starting at location I.
+void opcode_FX55(Chip8* chip8) {
+    uint8_t x = (chip8->opcode & 0x0F00) >> 8;
+    return;
+}
+
+// TODO:
+// FX65: LD Vx, [I]
+// Read registers V0 through Vx from memory starting at location I.
+void opcode_FX65(Chip8* chip8) {
+    return;
 }
