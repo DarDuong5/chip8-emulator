@@ -241,17 +241,17 @@ void opcode_CXKK(Chip8* chip8) {
 void opcode_DXYN(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;
     uint8_t y = (chip8->opcode & 0x00F0) >> 4;
-    uint8_t height = opcode & 0x000F;
+    uint8_t height = chip8->opcode & 0x000F;
 
-    uint8_t xPos = registers[x] % DISPLAY_WIDTH;
-    uint8_t yPos = registers[y] % DISPLAY_HEIGHT;
+    uint8_t xPos = chip8->varRegisters[x] % DISPLAY_WIDTH;
+    uint8_t yPos = chip8->varRegisters[y] % DISPLAY_HEIGHT;
 
     chip8->varRegisters[0xF] = 0;
 
     for (int row = 0; row < height; row++) {
         uint8_t spriteByte = chip8->memory[chip8->I + row];
         for (int col = 0; col < 8; col++) {
-            if (spriteByte & (0x80 >> col) != 0) {
+            if ((spriteByte & (0x80 >> col)) != 0) {
                 uint8_t drawX = (xPos + col) % DISPLAY_WIDTH;
                 uint8_t drawY = (yPos + row) % DISPLAY_HEIGHT;
 
@@ -265,7 +265,7 @@ void opcode_DXYN(Chip8* chip8) {
         }
 
     }
-    chip8->PC += 2
+    chip8->PC += 2;
 }
 
 // EX9E: SKP Vx
@@ -287,7 +287,7 @@ void opcode_EXA1(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;
     uint8_t key = chip8->varRegisters[x];
 
-    if (!chip->keyPad[key]) {
+    if (!chip8->keyPad[key]) {
         chip8->PC += 4;
     } else {
         chip8->PC += 2;
@@ -311,7 +311,7 @@ void opcode_FX0A(Chip8* chip8) {
 
     while (i < NUM_KEYS) {
         if (chip8->keyPad[i]) {
-            chip8->varRegisters = i;
+            chip8->varRegisters[x] = i;
             keyPressed = true;
             break;
         } else {
@@ -373,12 +373,21 @@ void opcode_FX33(Chip8* chip8) {
 // Store registers V0 through Vx in memory starting at location I.
 void opcode_FX55(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;
-    return;
+    
+    for (int i = 0; i <= x; i++) {
+        chip8->memory[chip8->I + i] = chip8->varRegisters[i];
+    }
+    chip8->PC += 2;
 }
 
 // TODO:
 // FX65: LD Vx, [I]
 // Read registers V0 through Vx from memory starting at location I.
 void opcode_FX65(Chip8* chip8) {
-    return;
+    uint8_t x = (chip8->opcode & 0x0F00) >> 8;
+
+    for (int i = 0; i <= x; i++) {
+        chip8->varRegisters[i] = chip8->memory[chip8->I + i];
+    }
+    chip8->PC += 2;
 }
