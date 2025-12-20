@@ -39,5 +39,6 @@ void test_FX29();
 void test_FX33();
 void test_FX55();
 void test_FX65();
+void RUN_ALL_OPCODE_TESTS();
 
 #endif

@@ -10,6 +10,7 @@
 #define DISPLAY_WIDTH 64
 #define DISPLAY_HEIGHT 32
 #define NUM_KEYS 16
+#define PC_STARTING_POINT 0x200
 
 const uint8_t FONTSET_START_ADDRESS = 0x050;
 const unsigned int FONTSET_SIZE = 80;
@@ -46,6 +47,68 @@ public:
     uint8_t keyPad[NUM_KEYS];
     uint16_t opcode;
 
+	Chip8() {
+		initChip8();
+	}
+
+	void loadFontset() {
+		for (int i = 0; i < FONTSET_SIZE; i++) {
+			memory[FONTSET_START_ADDRESS + i] = fontset[i];
+		}
+	}
+
+	void clearMemory() {
+		for (int i = 0; i < MEMORY_SIZE; i++) {
+			memory[i] = 0;
+		}
+	}
+
+	void clearRegisters() {
+		for (int i = 0; i < NUM_OF_V_REGISTERS; i++) {
+			varRegisters[i] = 0;
+		}
+	}
+
+	void clearStack() {
+		for (int i = 0; i < STACK_SIZE; i++) {
+			stack[i] = 0;
+		}
+	}
+
+	void clearDisplay() {
+		for (int h = 0; h < DISPLAY_HEIGHT; h++) {
+			for (int w = 0; w < DISPLAY_WIDTH; w++) {
+				display[w][h] = 0;
+			}
+		}
+	}
+
+	void clearKeypad() {
+		for (int i = 0; i < NUM_KEYS; i++) {
+			keyPad[i] = 0;
+		}
+	}
+
+	void initChip8() {
+		loadFontset();
+		clearMemory();
+		clearDisplay();
+		clearRegisters();
+		clearStack();
+		clearKeypad();
+		PC = PC_STARTING_POINT;
+		I = 0;
+		stackPointer = 0;
+		opcode = 0;
+		delayTimer = 0;
+		soundTimer = 0;
+		
+	}
+
+	// TODO
+	void loadROM() {
+		return;
+	}
 };
 
 #endif
