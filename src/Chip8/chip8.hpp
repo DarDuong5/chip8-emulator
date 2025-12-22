@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <cstdint>
+#include <fstream>
+#include <string>
 
 #define NUM_OF_V_REGISTERS 16
 #define MEMORY_SIZE 4096
@@ -105,10 +107,28 @@ public:
 		
 	}
 
-	// TODO
-	void loadROM() {
-		return;
+	void loadROM(char* const filename) {
+		std::ifstream file(filename, std::ios:binary | std::ios:ate);
+
+		if (file.is_open()) {
+			std::streampos size = file.tellg();
+			char* buffer = new char[size];
+
+			file.seekg(0, std::ios::beg);
+			file.read(buffer, size);
+			file.close();
+
+			for (long i = 0; i < size; i++) {
+				memory[PC_STARTING_POINT + i] = buffer[i];
+			}
+
+			free(buffer);
+		}
 	}
 };
+
+void updateTimers(Chip8* chip8);
+void fetchInstructions(Chip8* chip8);
+void decodeAndExecuteInstructions(Chip8* chip8);
 
 #endif
