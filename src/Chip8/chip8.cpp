@@ -30,6 +30,7 @@ void decodeAndExecuteInstructions(Chip8* chip8) {
                 default:
                     std::cout << "No valid opcode for 0x0000." << std::endl;
             }
+            break;
         case 0x1000:
             opcode_1NNN(chip8);
             break;
@@ -81,8 +82,9 @@ void decodeAndExecuteInstructions(Chip8* chip8) {
                     opcode_8XYE(chip8);
                     break;
                 default:
-                    std::cout << "No valid opcode for 0x8000." std::endl;
+                    std::cout << "No valid opcode for 0x8000." << std::endl;
             }
+            break;
         case 0x9000:
             opcode_9XY0(chip8);
             break;
@@ -109,6 +111,7 @@ void decodeAndExecuteInstructions(Chip8* chip8) {
                 default:
                     std::cout << "No valid opcode for 0xE000." << std::endl;
             }
+            break;
         case 0xF000:
             switch(chip8->opcode & 0xF0FF) {
                 case 0xF007:
@@ -141,6 +144,7 @@ void decodeAndExecuteInstructions(Chip8* chip8) {
                 default:
                     std::cout << "No valid opcode for 0xF000." << std::endl;
             }
+            break;
         default:
             std::cout << "No valid opcode." << std::endl;
     }

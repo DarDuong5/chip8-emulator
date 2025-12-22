@@ -108,7 +108,7 @@ public:
 	}
 
 	void loadROM(char* const filename) {
-		std::ifstream file(filename, std::ios:binary | std::ios:ate);
+		std::ifstream file(filename, std::ios::binary | std::ios::ate);
 
 		if (file.is_open()) {
 			std::streampos size = file.tellg();
