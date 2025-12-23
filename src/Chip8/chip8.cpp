@@ -149,3 +149,4 @@ void decodeAndExecuteInstructions(Chip8* chip8) {
             std::cout << "No valid opcode." << std::endl;
     }
 }
+
