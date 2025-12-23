@@ -49,6 +49,9 @@ public:
     uint8_t keyPad[NUM_KEYS];
     uint16_t opcode;
 
+	bool isPaused;
+	bool isRunning;
+
 	Chip8() {
 		initChip8();
 	}
@@ -104,10 +107,11 @@ public:
 		opcode = 0;
 		delayTimer = 0;
 		soundTimer = 0;
-		
+		isRunning = true;
+		isPaused = false;
 	}
 
-	void loadROM(char* const filename) {
+	void loadROM(const char* filename) {
 		std::ifstream file(filename, std::ios::binary | std::ios::ate);
 
 		if (file.is_open()) {

@@ -306,22 +306,20 @@ void opcode_FX07(Chip8* chip8) {
 // Wait for a key press, store the value of the key in Vx.
 void opcode_FX0A(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;    
-    int i = 0;
     bool keyPressed = false;
 
-    while (i < NUM_KEYS) {
+    for (int i = 0; i < NUM_KEYS; i++) {
         if (chip8->keyPad[i]) {
             chip8->varRegisters[x] = i;
             keyPressed = true;
             break;
-        } else {
-            i++;
         }
     }
 
-    if (!keyPressed) {
-        chip8->PC -= 2;
+    if (keyPressed) {
+        chip8->PC += 2;
     }
+    // If no key pressed, don't increment PC so instruction repeats next cycle
 }
 
 // FX15: LD DT, Vx

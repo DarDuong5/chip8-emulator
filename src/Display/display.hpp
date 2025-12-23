@@ -7,8 +7,8 @@
 
 #define ON 0xFFFFFFFF
 #define OFF 0x00000000
-#define X_SCALE 10
-#define Y_SCALE 10
+#define X_SCALE 16
+#define Y_SCALE 16
 
 class SDLContext {
 public:
