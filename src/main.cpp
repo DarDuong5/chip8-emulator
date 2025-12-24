@@ -10,7 +10,6 @@
 #include <fstream>
 #include <string>
 
-
 int main(int argc, char* argv[]) {
 
     /* TESTS
@@ -43,12 +42,12 @@ int main(int argc, char* argv[]) {
         decodeAndExecuteInstructions(&chip8);
         drawSDL(&sdlContext, chip8);
         updateTimers(&chip8);
-        std::this_thread::sleep_for(std::chrono::milliseconds(16)); // Roughly 60Hz
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         processInput(&chip8);
         while (chip8.isPaused && chip8.isRunning) {
             processInput(&chip8);
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
 
@@ -57,31 +56,3 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
-
-
-/*
-How to compile and run:
-
-Bash
-g++ -Wall -Wextra -g3 \
-    src/Chip8/chip8.cpp \
-    src/Display/display.cpp \
-    src/Instructions/instructions.cpp \
-    src/Keypad/keypad.cpp \
-    src/Tests/test_instructions.cpp \
-    src/Tests/test_chip8.cpp \
-    src/main.cpp \
-    -o output/chip8 \
-    $(sdl2-config --cflags --libs)
-
-Powershell
-g++ -Wall -Wextra -g3 
-src/Chip8/chip8.cpp 
-src/Display/display.cpp 
-src/Instructions/instructions.cpp 
-src/Keypad/keypad.cpp 
-src/Tests/test_instructions.cpp 
-src/Tests/test_chip8.cpp
-.\src\main.cpp 
--o output/main.exe
-*/
