@@ -31,7 +31,7 @@ void processInput(Chip8* chip8) {
                 }
                 std::cout << event.key.keysym.sym << " key pressed, restarting system.." << std::endl;
                 chip8->initChip8();
-                //chip8->loadROM();
+                chip8->loadROM();
                 break;
             case SDLK_1: case SDLK_2: case SDLK_3: case SDLK_4: case SDLK_q: case SDLK_w: case SDLK_e: case SDLK_r: case SDLK_a: case SDLK_s:
             case SDLK_d: case SDLK_f: case SDLK_z: case SDLK_x: case SDLK_c: case SDLK_v:

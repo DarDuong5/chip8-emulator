@@ -48,7 +48,7 @@ public:
     uint8_t varRegisters[NUM_OF_V_REGISTERS]; // V0 through VF
     uint8_t keyPad[NUM_KEYS];
     uint16_t opcode;
-
+	const char* romPath;
 	bool isPaused;
 	bool isRunning;
 
@@ -111,8 +111,8 @@ public:
 		isPaused = false;
 	}
 
-	void loadROM(const char* filename) {
-		std::ifstream file(filename, std::ios::binary | std::ios::ate);
+	void loadROM() {
+		std::ifstream file(romPath, std::ios::binary | std::ios::ate);
 
 		if (file.is_open()) {
 			std::streampos size = file.tellg();

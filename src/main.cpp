@@ -11,11 +11,49 @@
 #include <string>
 
 
-int main() {
+int main(int argc, char* argv[]) {
+
+    /* TESTS
     RUN_ALL_OPCODE_TESTS();
     RUN_ALL_CHIP8_TESTS();
 
     std::cout << "All tests passed successfully!" << std::endl;
+    */
+
+    if (argc < 2) {
+        std::cout << "Usage: " << argv[0] << " <path_to_rom>" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    Chip8 chip8;
+    const char* rom = argv[1];
+
+    if (!rom) {
+        std::cout << "ROM path not provided." << std::endl;
+        std::cout << "Usage: " << argv[0] << " <path_to_rom>" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    chip8.romPath = rom;
+    chip8.loadROM();
+
+    SDLContext sdlContext = initSDL();
+
+    while (chip8.isRunning) {
+        decodeAndExecuteInstructions(&chip8);
+        drawSDL(&sdlContext, chip8);
+        updateTimers(&chip8);
+        std::this_thread::sleep_for(std::chrono::milliseconds(16)); // Roughly 60Hz
+
+        processInput(&chip8);
+        while (chip8.isPaused && chip8.isRunning) {
+            processInput(&chip8);
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+    }
+
+    kill(&sdlContext);
+    std::cout << "Emulation ended." << std::endl;
 
     return 0;
 }
