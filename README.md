@@ -14,6 +14,7 @@ pacman -S mingw-w64-x86_64-SDL2
 ```
 
 ## Compiling
+Bash
 ``` bash
 g++ -Wall -Wextra -g3 \
     src/Chip8/chip8.cpp \
@@ -27,6 +28,7 @@ g++ -Wall -Wextra -g3 \
     $(sdl2-config --cflags --libs)
 ```
 
+Powershell
 ``` powershell
 g++ -Wall -Wextra -g3 src/Chip8/chip8.cpp src/Display/display.cpp src/Instructions/instructions.cpp 
 src/Keypad/keypad.cpp src/Tests/test_instructions.cpp src/Tests/test_chip8.cpp src/main.cpp -o output/chip8 -lmingw32 -lSDL2main -lSDL2
