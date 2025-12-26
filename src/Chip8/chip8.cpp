@@ -17,6 +17,8 @@ void fetchInstructions(Chip8* chip8) {
 
 void decodeAndExecuteInstructions(Chip8* chip8) {
     fetchInstructions(chip8);
+    std::cout << "PC: 0x" << std::hex << chip8->PC << ", Opcode: 0x" << chip8->opcode << std::endl;
+
 
     switch(chip8->opcode & 0xF000) {
         case 0x0000:
@@ -28,7 +30,7 @@ void decodeAndExecuteInstructions(Chip8* chip8) {
                     opcode_00EE(chip8);
                     break;
                 default:
-                    std::cout << "No valid opcode for 0x0000." << std::endl;
+                    std::cout << "No valid opcode for 0x0000: " << chip8->opcode << std::endl;
             }
             break;
         case 0x1000:

@@ -19,8 +19,8 @@ void opcode_00E0(Chip8* chip8) {
 // 00EE: RET
 // Return from a subroutine.
 void opcode_00EE(Chip8* chip8) {
-    chip8->stackPointer -= 1;
     chip8->PC = chip8->stack[chip8->stackPointer];
+    chip8->stackPointer -= 1;
 }
 
 // 1NNN: JP addr
@@ -34,8 +34,8 @@ void opcode_1NNN(Chip8* chip8) {
 // Call subroutine at NNN.
 void opcode_2NNN(Chip8* chip8) {
     uint16_t nnn = chip8->opcode & 0x0FFF;
-    chip8->stack[chip8->stackPointer] = chip8->PC;
     chip8->stackPointer += 1;
+    chip8->stack[chip8->stackPointer] = chip8->PC + 2;
     chip8->PC = nnn;
 }
 
@@ -111,6 +111,7 @@ void opcode_8XY1(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;
     uint8_t y = (chip8->opcode & 0x00F0) >> 4;
     chip8->varRegisters[x] |= chip8->varRegisters[y];
+    chip8->varRegisters[0xF] = 0;
     chip8->PC += 2;
 }
 
@@ -120,6 +121,7 @@ void opcode_8XY2(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;
     uint8_t y = (chip8->opcode & 0x00F0) >> 4;
     chip8->varRegisters[x] &= chip8->varRegisters[y];
+    chip8->varRegisters[0xF] = 0;
     chip8->PC += 2;
 }
 
@@ -129,6 +131,7 @@ void opcode_8XY3(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;
     uint8_t y = (chip8->opcode & 0x00F0) >> 4;
     chip8->varRegisters[x] ^= chip8->varRegisters[y];
+    chip8->varRegisters[0xF] = 0;
     chip8->PC += 2;
 }
 
@@ -139,13 +142,14 @@ void opcode_8XY4(Chip8* chip8) {
     uint8_t y = (chip8->opcode & 0x00F0) >> 4;
 
     uint16_t sum = chip8->varRegisters[x] + chip8->varRegisters[y];
+    chip8->varRegisters[x] = sum & 0x00FF;
+
     if (sum > 255) {
         chip8->varRegisters[0xF] = 1;
     } else {
         chip8->varRegisters[0xF] = 0;
     }
 
-    chip8->varRegisters[x] = sum & 0x00FF;
     chip8->PC += 2;
 }
 
@@ -155,22 +159,25 @@ void opcode_8XY5(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;
     uint8_t y = (chip8->opcode & 0x00F0) >> 4;
 
-    if (chip8->varRegisters[x] > chip8->varRegisters[y]) {
-        chip8->varRegisters[0xF] = 1;
-    } else {
-        chip8->varRegisters[0xF] = 0;
-    }
-
+    uint8_t bit = chip8->varRegisters[x] >= chip8->varRegisters[y];
     chip8->varRegisters[x] -= chip8->varRegisters[y];
+    chip8->varRegisters[0xF] = bit;
+
     chip8->PC += 2;
 }
 
-// 8XY6: SHR Vx
+// 8XY6: SHR Vx {, Vy}
 // Set Vx = Vx SHR 1, set VF to 1 if the least-significant bit of Vx is 1.
 void opcode_8XY6(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;
-    chip8->varRegisters[0xF] = chip8->varRegisters[x] & 0x0001;
-    chip8->varRegisters[x] >>= 1;
+    uint8_t y = (chip8->opcode & 0x00F0) >> 4;
+
+    chip8->varRegisters[x] = chip8->varRegisters[y];
+
+    uint8_t bit = chip8->varRegisters[x] & (1);
+    chip8->varRegisters[x] = chip8->varRegisters[x] >> 1;
+    chip8->varRegisters[0xF] = bit;
+
     chip8->PC += 2;
 }
 
@@ -180,13 +187,10 @@ void opcode_8XY7(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;
     uint8_t y = (chip8->opcode & 0x00F0) >> 4;
 
-    if (chip8->varRegisters[y] > chip8->varRegisters[x]) {
-        chip8->varRegisters[0xF] = 1;
-    } else {
-        chip8->varRegisters[0xF] = 0;
-    }
-
+    uint8_t bit = chip8->varRegisters[y] >= chip8->varRegisters[x];
     chip8->varRegisters[x] = chip8->varRegisters[y] - chip8->varRegisters[x];
+    chip8->varRegisters[0xF] = bit;
+
     chip8->PC += 2;
 }
 
@@ -194,8 +198,13 @@ void opcode_8XY7(Chip8* chip8) {
 // Set Vx = Vx SHL 1, set VF to 1 if the most-significant bit of Vx is 1.
 void opcode_8XYE(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;
-    chip8->varRegisters[0xF] = (chip8->varRegisters[x] & 0x80) >> 7;
-    chip8->varRegisters[x] <<= 1;
+    uint8_t y = (chip8->opcode & 0x00F0) >> 4;
+
+    chip8->varRegisters[x] = chip8->varRegisters[y];
+
+    uint8_t bit = (chip8->varRegisters[x] & 0x80) >> 7;
+    chip8->varRegisters[x] = (chip8->varRegisters[x] << 1);
+    chip8->varRegisters[0xF] = bit;
     chip8->PC += 2;
 }
 
@@ -241,32 +250,27 @@ void opcode_CXKK(Chip8* chip8) {
 void opcode_DXYN(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;
     uint8_t y = (chip8->opcode & 0x00F0) >> 4;
-    uint8_t height = chip8->opcode & 0x000F;
+    uint8_t n = (chip8->opcode & 0x000F);
 
-    uint8_t xPos = chip8->varRegisters[x] % DISPLAY_WIDTH;
-    uint8_t yPos = chip8->varRegisters[y] % DISPLAY_HEIGHT;
+    int Vx = chip8->varRegisters[x]%DISPLAY_WIDTH;
+    int Vy = chip8->varRegisters[y]%DISPLAY_HEIGHT;
 
     chip8->varRegisters[0xF] = 0;
-
-    for (int row = 0; row < height; row++) {
-        uint8_t spriteByte = chip8->memory[chip8->I + row];
-        for (int col = 0; col < 8; col++) {
-            if ((spriteByte & (0x80 >> col)) != 0) {
-                uint8_t drawX = (xPos + col) % DISPLAY_WIDTH;
-                uint8_t drawY = (yPos + row) % DISPLAY_HEIGHT;
-
-                if (chip8->display[drawX][drawY] != 0) {
-                    chip8->varRegisters[0xF] = 1;
-                }
-
-                chip8->display[drawX][drawY] ^= ON;
-            }
-
+    for (int i = 0; i < n && (Vy+i)<DISPLAY_HEIGHT; i++) {
+        uint8_t sprite = chip8->memory[chip8->I + i];
+        for (int j = 0; j < 8 && (Vx+j)<DISPLAY_WIDTH; j++) {
+            uint8_t bit = ((sprite << j) & 0x80) >> 7;
+            // wrapping disabled; by for loop conditions
+            int newX = (Vx+j);
+            int newY = (Vy+i);
+            if (bit && chip8->display[newX][newY]) chip8->varRegisters[0xF] = 1;
+            chip8->display[newX][newY] ^= bit;
         }
-
     }
+    
     chip8->PC += 2;
 }
+
 
 // EX9E: SKP Vx
 // Skip next instruction if key with the value of Vx is pressed.
@@ -330,7 +334,7 @@ void opcode_FX15(Chip8* chip8) {
     chip8->PC += 2;
 }
 
-// FX18: LD DT, Vx
+// FX18: LD ST, Vx
 // Set sound timer = Vx.
 void opcode_FX18(Chip8* chip8) {
     uint8_t x = (chip8->opcode & 0x0F00) >> 8;
@@ -375,6 +379,8 @@ void opcode_FX55(Chip8* chip8) {
     for (int i = 0; i <= x; i++) {
         chip8->memory[chip8->I + i] = chip8->varRegisters[i];
     }
+    chip8->I += x + 1; 
+
     chip8->PC += 2;
 }
 
@@ -387,5 +393,7 @@ void opcode_FX65(Chip8* chip8) {
     for (int i = 0; i <= x; i++) {
         chip8->varRegisters[i] = chip8->memory[chip8->I + i];
     }
+    chip8->I += x + 1;
+
     chip8->PC += 2;
 }

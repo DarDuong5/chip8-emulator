@@ -47,14 +47,17 @@ void drawSDL(SDLContext* context, Chip8& chip8) {
 
     for (int y = 0; y < DISPLAY_HEIGHT; y++) {
         for (int x = 0; x < DISPLAY_WIDTH; x++) {
+            SDL_Rect rect;
+            rect.x = x;
+            rect.y = y;
+            rect.w = 1;
+            rect.h = 1;
             if (chip8.display[x][y]) {
-                SDL_Rect pixel = {
-                    x,
-                    y,
-                    1,
-                    1
-                };
-                SDL_RenderFillRect(context->renderer, &pixel);
+                SDL_SetRenderDrawColor(context->renderer, 255, 255, 255, 255);
+                SDL_RenderFillRect(context->renderer, &rect);
+            } else {
+                SDL_SetRenderDrawColor(context->renderer, 0, 0, 0, 255);
+                SDL_RenderFillRect(context->renderer, &rect);
             }
         }
     }
