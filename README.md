@@ -27,6 +27,11 @@ g++ -Wall -Wextra -g3 \
     $(sdl2-config --cflags --libs)
 ```
 
+``` powershell
+g++ -Wall -Wextra -g3 src/Chip8/chip8.cpp src/Display/display.cpp src/Instructions/instructions.cpp 
+src/Keypad/keypad.cpp src/Tests/test_instructions.cpp src/Tests/test_chip8.cpp src/main.cpp -o output/chip8 -lmingw32 -lSDL2main -lSDL2
+```
+
 ## Running ROMs
 ``` bash
 ./output/chip8 <Insert ROM Path>
