@@ -4,13 +4,21 @@ Ensure you have SDL2 installed using the command below.
 ## Installation
 Linux
 ``` bash
-sudo apt-get update
+sudo apt-get update # Update first
 sudo apt-get install libsdl2-dev libsdl2-2.0-0
 ```
 
-Windows
+Windows (through MSYS2 MinGW64)
 ``` bash
-pacman -S mingw-w64-x86_64-SDL2
+pacman -Syu # Update first
+# If it tells you to close the terminal:
+# Close it
+# Reopen MINGW64
+# Run pacman -Syu again
+# Repeat until it says nothing to update.
+pacman -S --needed \
+    mingw-w64-x86_64-toolchain \
+    mingw-w64-x86_64-SDL2
 ```
 
 ## Compiling
