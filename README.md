@@ -47,5 +47,19 @@ src/Keypad/keypad.cpp src/Tests/test_instructions.cpp src/Tests/test_chip8.cpp s
 ./output/chip8 <Insert ROM Path>
 ```
 
+## Controls
+Chip-8 Keypad Mapping
+``` bash
+1 2 3 C    ->    1 2 3 4
+4 5 6 D    ->    Q W E R
+7 8 9 E    ->    A S D F
+A 0 B F    ->    Z X C V
+```
+
+Others:
+- Escape: Quit
+- RCtrl: Restart
+- Space: Pause
+
 NOTE: There are bugs that needs to be fixed.
 
