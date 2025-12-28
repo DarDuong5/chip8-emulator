@@ -1,5 +1,6 @@
 # Chip8
-Ensure you have SDL2 installed using the command below.
+Ensure you have C++ 17.
+Have SDL2 installed using the command below.
 
 ## Installation
 Linux
